@@ -9,18 +9,16 @@ An interactive end-to-end Business Intelligence project built using **Power BI D
 Below are the active modules engineered within the Power BI reporting canvas:
 
 ### 1. Executive Performance Scorecard
-*High-level strategic metrics capturing total throughput and conversion efficiency.*
-![Total Applications KPI Card](total_applications.png)
+*High-level strategic metrics capturing total throughput and pipeline volume.* ![Total Applications KPI Card](dashboard/total_applications.png)
 
 ### 2. Application Process Friction (Easy Apply Rates)
-*Analyzing candidate behavior based on platform submission features (One-Click Easy Apply vs. Traditional Forms).*
-![Easy Apply Rate Donut Chart](easy_apply_rate.png)
+*Analyzing candidate behavior based on platform submission features (One-Click Easy Apply vs. Traditional Forms).* ![Easy Apply Rate Donut Chart](dashboard/easy_apply_rate.png)
 
 ---
 
 ## 🗂️ Data Framework & Metrics Definition
 
-The analysis uses historical event logs extracted from the raw data sheet inside `data/job_application.xlsx`. To power the background evaluation matrix, the model implements custom **DAX (Data Analysis Expressions)** measures:
+The analysis uses historical event logs extracted from the raw data sheet inside the source workbook. To power the background evaluation matrix, the data model implements custom **DAX (Data Analysis Expressions)** measures:
 
 * **Total Active Pipeline:** Calculates total incoming applicant volume across all fields:
   $$\text{Total Applications} = \text{COUNT}(\text{raw}[\text{ID}])$$
@@ -44,10 +42,10 @@ To bypass geographic rendering issues common with raw unstructured text data, th
 ```text
 job-application-recruitment-dashboard/
 ├── dashboard/
-│   ├── total_applications.png       
+│   ├── total_applications.png        
 │   ├── easy_apply_rate.png           
 │   └── Recruitment_Analytics.pbix    
 ├── data/
 │   └── job_application.xlsx          
-├── .gitignore                        
-└── README.md                         
+├── .gitignore                    
+└── README.md                     
