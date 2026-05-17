@@ -44,7 +44,7 @@ job-application-recruitment-dashboard/
 ├── dashboard/
 │   ├── total_applications.png        
 │   ├── easy_apply_rate.png           
-│   └── Recruitment_Analytics.pbix    
+│   └── job-application-data.pbix   
 ├── data/
 │   └── job_application.xlsx          
 ├── .gitignore                    
