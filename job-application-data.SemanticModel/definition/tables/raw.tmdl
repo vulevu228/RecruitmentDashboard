@@ -1,0 +1,136 @@
+table raw
+	lineageTag: 765b3b48-1ad4-4ca8-8897-703944ba0d05
+
+	measure 'Total Applications' = count(raw[ID])
+		formatString: 0
+		lineageTag: 4d6c0c75-28c1-46cc-8bcb-5d84e1782238
+
+	measure 'Total Hires' = CALCULATE(COUNT(raw[ID]), raw[Hired] = TRUE)
+		formatString: 0
+		lineageTag: be2fff1a-f95e-4d49-9b98-69550415c103
+
+	measure 'Hiring Rate %' = DIVIDE([Total Hires], [Total Applications], 0)
+		formatString: 0.0%
+		lineageTag: 49155e3c-b992-4740-86ef-6bf80e62a77a
+
+	measure 'Easy Apply Applications' = CALCULATE([Total Applications], raw[Easy Apply] = TRUE)
+		formatString: #,0
+		lineageTag: 9a10001-3000-4a11-9a11-000000000002
+
+	measure 'Easy Apply Rate %' = DIVIDE([Easy Apply Applications], [Total Applications])
+		formatString: 0.0%
+		lineageTag: 9a10001-3000-4a11-9a11-000000000003
+
+	measure 'Traditional Hiring Rate %' = CALCULATE([Hiring Rate %], raw[Easy Apply] = FALSE)
+		formatString: 0.0%
+		lineageTag: 9a10001-3000-4a11-9a11-000000000004
+
+	measure 'Easy Apply Hiring Rate %' = CALCULATE([Hiring Rate %], raw[Easy Apply] = TRUE)
+		formatString: 0.0%
+		lineageTag: 9a10001-3000-4a11-9a11-000000000005
+
+	measure 'Hiring Rate Gap (pp)' = ([Traditional Hiring Rate %] - [Easy Apply Hiring Rate %]) * 100
+		formatString: +#,0.0;-#,0.0;0
+		lineageTag: 9a10001-3000-4a11-9a11-000000000006
+
+	measure 'MoM Applications Growth %' = VAR MaxMonth = CALCULATE(MAX(raw[Application Month]), ALLSELECTED(raw)) VAR PriorMonth = EDATE(MaxMonth, -1) VAR CurrentVal = CALCULATE([Total Applications], raw[Application Month] = MaxMonth) VAR PriorVal = CALCULATE([Total Applications], raw[Application Month] = PriorMonth) RETURN DIVIDE(CurrentVal - PriorVal, PriorVal)
+		formatString: +0.0%;-0.0%;0.0%
+		lineageTag: 9a10001-3000-4a11-9a11-000000000007
+
+	measure 'Unique Cities' = DISTINCTCOUNT(raw[City])
+		formatString: #,0
+		lineageTag: 9a10001-3000-4a11-9a11-000000000008
+
+	measure 'Unique Job Titles' = DISTINCTCOUNT(raw[Job Title])
+		formatString: #,0
+		lineageTag: 9a10001-3000-4a11-9a11-000000000009
+
+	column ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 38fc9b98-1fd7-4091-82eb-33172971e768
+		summarizeBy: count
+		sourceColumn: ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: b19fb2e8-b8f4-411b-ad26-756c90c57b6b
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Application Month' = DATE(YEAR(raw[Date]), MONTH(raw[Date]), 1)
+		dataType: dateTime
+		formatString: mmm yyyy
+		lineageTag: 9a10001-3000-4a11-9a11-000000000001
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Job Title'
+		dataType: string
+		lineageTag: 8f5ea059-d71f-4cff-8b81-577b25cfa64d
+		summarizeBy: none
+		sourceColumn: Job Title
+
+		annotation SummarizationSetBy = Automatic
+
+	column Hired
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 7a30c9bc-2dce-4e4f-a124-eb50f0e3c23f
+		summarizeBy: none
+		sourceColumn: Hired
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Easy Apply'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: c51d3177-0b32-4106-9f2d-6f3c93063da7
+		summarizeBy: none
+		sourceColumn: Easy Apply
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 7fe619e1-119a-4fd4-8988-e2765bcb4ba6
+		dataCategory: City
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: bc91007e-e020-46df-85e0-3ce203ae4cb1
+		dataCategory: StateOrProvince
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	partition raw = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\emira\Projects\GitHub-Projects\job-application-recruitment-dashboard\data\job_application.xlsx"), null, true),
+				    raw_Sheet = Source{[Item="raw",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(raw_Sheet, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"ID", Int64.Type}, {"Date", type datetime}, {"Job Title", type text}, {"Job Location", type text}, {"Hired", type logical}, {"Easy Apply", type logical}}),
+				    #"Split Column by Delimiter" = Table.SplitColumn(#"Changed Type", "Job Location", Splitter.SplitTextByDelimiter(",", QuoteStyle.Csv), {"Job Location.1", "Job Location.2"}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Split Column by Delimiter",{{"Job Location.1", type text}, {"Job Location.2", type text}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type1",{{"Job Location.1", "City"}, {"Job Location.2", "State"}}),
+				    #"Trimmed Text" = Table.TransformColumns(#"Renamed Columns",{{"State", Text.Trim, type text}, {"City", Text.Trim, type text}})
+				in
+				    #"Trimmed Text"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
