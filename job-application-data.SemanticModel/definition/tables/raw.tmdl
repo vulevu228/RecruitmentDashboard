@@ -119,7 +119,7 @@ table raw
 		mode: import
 		source =
 				let
-				    Source = Excel.Workbook(File.Contents("C:\Users\emira\Projects\GitHub-Projects\job-application-recruitment-dashboard\data\job_application.xlsx"), null, true),
+				    Source = Excel.Workbook(File.Contents("C:\Users\emira\Projects\GitHub-Projects\RecruitmentDashboard\data\job_application.xlsx"), null, true),
 				    raw_Sheet = Source{[Item="raw",Kind="Sheet"]}[Data],
 				    #"Promoted Headers" = Table.PromoteHeaders(raw_Sheet, [PromoteAllScalars=true]),
 				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"ID", Int64.Type}, {"Date", type datetime}, {"Job Title", type text}, {"Job Location", type text}, {"Hired", type logical}, {"Easy Apply", type logical}}),
