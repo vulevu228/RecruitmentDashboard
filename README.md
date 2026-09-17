@@ -1,5 +1,7 @@
 # 🏢 Corporate Recruitment & Job Application Analytics Dashboard
 
+*One of my first data projects (May 2026).*
+
 Power BI dashboard over a year of raw job applications (`data/job_application.xlsx`, 32,596 rows), tracking pipeline volume, hiring rate, and application-channel friction.
 
 ## 🖥️ The Dashboard
